@@ -1,0 +1,86 @@
+Currently: need to add test components, write pdf
+
+2017-02-21 Keegan <keeganjk@uw.edu>
+
+    *added check for verifying output file is smaller than input
+     works in theory, not sure how to make an example test this
+
+    *known limitation: extremely small file input "testing1.txt" causes stats to be incorrect
+     original size: 15 bytes | compressed size: 0 bytes | compressed ratio: Infinity% 
+                                                        | elapsed time: 0.0278 seconds
+
+    *single char input file "testing4.txt" writes 0 byte file (possibly ok as it should be 1 bit)
+     would have had to write a decoding method to check this, "codes.txt" looks ok: [a=0]
+     tried copying 8 of the "compressed.txt" files to total a byte, did not work
+     the OS may simply not care about tallying something so small
+
+    *"Asbestos.txt" causes ArrayIndexOutOfBoundsException: 7940 at CharCounter line 44
+     last values before exception in CharCounter#CharCounter(String):
+     i: 3027, s.length(): 150494, s.charAt(i): (, myCounts[s.charAt(i)]: 2
+     not immediately clear why...
+
+2017-02-18 Keegan <keeganjk@uw.edu>
+
+    *deleted: HZIPOutputStream & BitOutputStream, didn't understand them,
+     found easier way to write
+
+    *line36-42Main#Main(args) created BitSet object, parsed encodedStr to the BitSet, 
+     BitSet.toByteArray() is writable in OutputStream
+
+    *removed debugging println's
+
+    *added comments
+
+    *added 'codes' OutputStream
+
+    *refactored file names in main to use string constants
+     also deleted BitUtils class, adding int constants instead in each file
+
+    *moved creation of encoded string from inside #Main to inside #CodingTree 
+     (in order to write field 'bits' which is the encoded message)
+
+    *codesOut BufferedWriter will create the file but 
+     will not write it if codesOut.close() not done
+
+    *added Stopwatch class for timing file read/compression/write
+
+    *added statistics println in #Main per spec
+
+    *changed public/private/protected field declarations in class HuffNode
+
+2017-02-12 Keegan <keeganjk@uw.edu>
+
+    *it appears there is no bit writing functionality in java... just byte
+    so, attempted to copy/paste book's wrapper classes for that - having method type issues
+    place debug on line32Main#Main(args) or comment out the file writing stuff below that
+
+    *see image 2_12_2017.png - the encodedStr is made from the binary char map
+    looks compressed to me, just need to figure out the binary file wrapper stuff
+
+2017-02-11 Keegan <keeganjk@uw.edu>
+
+    *see image 2_10_2017.png - as-is, every potential char creates a HuffNode (though not used)
+    fix later once working
+
+    *see image 2_11_2017.png - AVL tree for simple "Hello World!!!" input
+    the 'val' is only meaningful for the leaves
+  
+    *redundant creation of the tree might be happening
+    store all codes, after first creation somehow...
+
+    *deleted CodingTree#readEncodingTable(String) it's used for decoding
+    don't need it
+
+    *added string param to constructor line23:CodingTree#CodingTree(String)
+    originally used no-param constructor
+
+    *modified Main#main(args) to open the file, scan by line to a string
+    passes very large string to CodingTree#CodingTree(String)
+
+    *modified Main#main(args) - added if/else to account for byte order mark
+    previously caused arrayIndexOutOfBounds at first char read by CharCounter object
+    maybe CharCounter needs modified, ignoring it for now
+    see: https://stackoverflow.com/questions/1835430/byte-order-mark-screws-up-file-reading-in-java#1835529
+
+    *fixed Map codes.put(key, val) issue, Map was not initialized
+    87 keysets... pretty close to /expected_output/codes.txt
